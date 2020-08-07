@@ -21,13 +21,18 @@ def convert_pos(
     ret = []
     curpos = 0
     j = 0
+    lineno, col = lineno_cols[j]
     for i, line in enumerate(text.split("\n"), start=1):
-        if i == lineno_cols[j][0]:
-            ret.append(lineno_cols[j][1] + curpos)
+        while i == lineno:
+            ret.append(col + curpos)
             j += 1
             if j == len(lineno_cols):
                 break
+            lineno, col = lineno_cols[j]
+        if j == len(lineno_cols):
+            break
         curpos += len(line) + 1
+    assert len(ret) == len(lineno_cols)
     return ret
 
 
@@ -50,11 +55,19 @@ class Node:
         return ret
 
     def query(self, key: str, value: Optional[str] = None) -> Optional["Node"]:
-        if key in self.attrs and (value is not None or value in self.attrs[key]):
+        if key in self.attrs and (value is None or value in self.attrs[key]):
             return self
         for node in self.childlen:
             if isinstance(node, Node):
                 if ret := node.query(key, value):
+                    return ret
+
+    def get_element_by_tagname(self, tagname: str) -> Optional["Node"]:
+        if tagname == self.tag:
+            return self
+        for node in self.childlen:
+            if isinstance(node, Node):
+                if ret := node.get_element_by_tagname(tagname):
                     return ret
 
 
@@ -69,12 +82,19 @@ class Parser(HTMLParser):
         for k, v in attrs:
             l = node.attrs[k]
             if v:
-                l.append(v)
+                l.extend(v.split())
         self.cur.childlen.append(node)
-        self.cur = node
+        if tag not in {"meta", "link"}:
+            self.cur = node
 
     def handle_endtag(self, tag: str) -> None:
-        assert tag == self.cur.tag
+        if tag != self.cur.tag:
+            raise ValueError(
+                f"""Invalid HTML Format
+        cur: {self.cur.tag} {self.cur.attrs}
+        tag: {tag}
+        """
+            )
         self.cur = self.cur.parent
 
     def handle_data(self, data):

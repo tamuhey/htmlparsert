@@ -1,5 +1,15 @@
 import pytest
-from htmlparsert.parser import convert_pos, parse
+from htmlparsert.parser import Node, convert_pos, parse
+
+
+def print_nodes(node: Node, indent=""):
+    print(indent + f"node {node.tag} {node.attrs}")
+    nextindent = indent + " " * 4
+    for c in node.childlen:
+        if isinstance(c, Node):
+            print_nodes(c, indent=nextindent)
+        else:
+            print(nextindent + c.text)
 
 
 @pytest.mark.parametrize(
@@ -22,6 +32,9 @@ def test_extract_string(html, expected, attr):
     node = parse(html)
     if attr:
         node = node.query(*attr)
+    if node is None:
+        print_nodes(parse(html))
+        raise ValueError("internall error")
     tnodes = node.extract_text_nodes()
     assert "".join(x.text for x in tnodes) == expected, tnodes
     for pos, t in zip(convert_pos([t.start_pos for t in tnodes], html), tnodes):
