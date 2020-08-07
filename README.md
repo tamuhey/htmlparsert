@@ -1,5 +1,8 @@
 # A lightweight, no dependency HTML parser for text processing
 
+This is useful to extract the character data and their offset from html.
+(Other Python html libraries don't provide the offset data.)
+
 ## Usage
 
 install: `pip install htmlparsert`
@@ -16,5 +19,8 @@ html = """
 
 </html>
 """
-parse(html)
+node = parse(html)
 ```
+
+`node` holds html tag nodes (`Node`) and text data (`TextNode`).
+All text data have its offset in html.
