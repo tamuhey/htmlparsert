@@ -36,7 +36,7 @@ def test_extract_string(html, expected, attr):
     if node is None:
         print_nodes(parse(html))
         raise ValueError("internall error")
-    tnodes = node.extract_text_nodes()
+    tnodes = node.text_nodes
     assert "".join(x.text for x in tnodes) == expected, tnodes
     for pos, t in zip(convert_pos([t.start_pos for t in tnodes], html), tnodes):
         assert html[pos : pos + len(t.text)] == t.text

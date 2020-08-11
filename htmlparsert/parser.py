@@ -45,11 +45,20 @@ class Node:
         default_factory=lambda: defaultdict(list)
     )
 
-    def extract_text_nodes(self) -> List[TextNode]:
+    @property
+    def text_nodes(self) -> List[TextNode]:
+        """Extract TextNode from self
+        
+        Example:
+            >>> from htmlparsert import parse
+            >>> node = parse('''<a>foo <b> bar </b></a>''')
+            >>> node.text_nodes
+            [TextNode(start_pos=(1, 3), text='foo '), TextNode(start_pos=(1, 10), text=' bar ')]
+        """
         ret = []
         for node in self.childlen:
             if isinstance(node, Node):
-                ret.extend(node.extract_text_nodes())
+                ret.extend(node.text_nodes)
             elif isinstance(node, TextNode):
                 ret.append(node)
         return ret
