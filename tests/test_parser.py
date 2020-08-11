@@ -26,6 +26,7 @@ def print_nodes(node: Node, indent=""):
         ),
         ("<a></a>", None, ""),
         ("", None, ""),
+        ("<div><a><hr><hr>fooo</a><hr></div><p>bar</p>", None, "fooobar"),
     ],
 )
 def test_extract_string(html, expected, attr):

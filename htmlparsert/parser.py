@@ -77,6 +77,11 @@ class Parser(HTMLParser):
         self.root = Node(tag="", parent=None)
         self.cur = self.root
 
+    def handle_startendtag(
+        self, tag: str, attrs: List[Tuple[str, Optional[str]]]
+    ) -> None:
+        pass
+
     def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]) -> None:
         node = Node(tag=tag, parent=self.cur)
         for k, v in attrs:
@@ -84,18 +89,11 @@ class Parser(HTMLParser):
             if v:
                 l.extend(v.split())
         self.cur.childlen.append(node)
-        if tag not in {"meta", "link"}:
-            self.cur = node
+        self.cur = node
 
     def handle_endtag(self, tag: str) -> None:
-        if tag != self.cur.tag:
-            raise ValueError(
-                f"""Invalid HTML Format
-        cur: {self.cur.tag} {self.cur.attrs}
-        tag: {tag}
-        """
-            )
-        self.cur = self.cur.parent
+        while tag != self.cur.tag:
+            self.cur = self.cur.parent
 
     def handle_data(self, data):
         textnode = TextNode(self.getpos(), data)
