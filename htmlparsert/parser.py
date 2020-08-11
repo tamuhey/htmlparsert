@@ -51,9 +51,11 @@ class Node:
         
         Example:
             >>> from htmlparsert import parse
-            >>> node = parse('''<a>foo <b> bar </b></a>''')
+            >>> node = parse('''<a>foo 
+            ...   <b> bar </b></a>''')
             >>> node.text_nodes
-            [TextNode(start_pos=(1, 3), text='foo '), TextNode(start_pos=(1, 10), text=' bar ')]
+            [TextNode(start_pos=(1, 3), text='foo \\n  '), TextNode(start_pos=(2, 5), text=' bar ')]
+
         """
         ret = []
         for node in self.childlen:
